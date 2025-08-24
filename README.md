@@ -43,7 +43,7 @@ A complete lead capture system with a beautiful form interface and backend data 
 ```
 ├── index.html          # Main lead capture form
 ├── admin.html          # Admin dashboard
-├── server.js           # Backend server
+├── api/index.js        # API handler (Vercel serverless)
 ├── package.json        # Dependencies
 ├── leads.json          # Data storage (created automatically)
 └── README.md           # This file
@@ -177,4 +177,8 @@ For issues or questions:
 
 ## License
 
-MIT License - feel free to use this for your projects! 
+MIT License - feel free to use this for your projects!
+
+---
+
+**Latest Update**: Simplified API structure for better Vercel compatibility 
