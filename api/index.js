@@ -29,10 +29,15 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const { pathname } = new URL(req.url, `http://${req.headers.host}`);
-
     try {
         await initializeDataFile();
+
+        // Handle different API routes based on the request path
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const pathname = url.pathname;
+
+        console.log('Request pathname:', pathname);
+        console.log('Request method:', req.method);
 
         // Handle different API routes
         if (pathname === '/api/submit-lead' && req.method === 'POST') {
@@ -115,13 +120,18 @@ module.exports = async (req, res) => {
 
         } else {
             // Handle unknown routes
-            return res.status(404).json({ error: 'API endpoint not found' });
+            return res.status(404).json({ 
+                error: 'API endpoint not found',
+                pathname: pathname,
+                method: req.method
+            });
         }
 
     } catch (error) {
         console.error('Error processing request:', error);
         return res.status(500).json({ 
-            error: 'Internal server error' 
+            error: 'Internal server error',
+            details: error.message
         });
     }
 }; 
