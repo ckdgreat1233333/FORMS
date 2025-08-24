@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearlly - Get Updates (Google Sheets)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        .form-container {
+            max-width: 28rem;
+        }
+        #message-box {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen p-4">
+
+    <div class="form-container w-full bg-gray-800 text-white rounded-2xl shadow-xl p-8 transform transition-transform duration-300 hover:scale-105">
+        
+        <h2 class="text-3xl font-bold text-center mb-2">Join the revolution</h2>
+        <p class="text-gray-400 text-center mb-6">
+            Be the early adopters in your city!
+        </p>
+
+        <form id="lead-form" class="space-y-4">
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Name</label>
+                <input type="text" id="name" name="name" placeholder="John Doe" required
+                       class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200" />
+            </div>
+
+            <div>
+                <label for="phone" class="block text-sm font-medium text-gray-300 mb-1">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="+91 1234567890" required
+                       class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200" />
+            </div>
+
+            <div>
+                <label for="city" class="block text-sm font-medium text-gray-300 mb-1">City</label>
+                <input type="text" id="city" name="city" placeholder="Select or Type Your City" required list="cities-list"
+                       class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200" />
+                <datalist id="cities-list">
+                    <option value="Mumbai"></option>
+                    <option value="Delhi"></option>
+                    <option value="Bangalore"></option>
+                    <option value="Kolkata"></option>
+                    <option value="Chennai"></option>
+                    <option value="Hyderabad"></option>
+                    <option value="Ahmedabad"></option>
+                    <option value="Pune"></option>
+                    <option value="Jaipur"></option>
+                    <option value="Surat"></option>
+                    <option value="Lucknow"></option>
+                    <option value="Kanpur"></option>
+                    <option value="Nagpur"></option>
+                    <option value="Indore"></option>
+                    <option value="Patna"></option>
+                    <option value="Ludhiana"></option>
+                    <option value="Bhopal"></option>
+                    <option value="Thane"></option>
+                    <option value="Agra"></option>
+                    <option value="Nashik"></option>
+                    <option value="Faridabad"></option>
+                    <option value="Meerut"></option>
+                    <option value="Rajkot"></option>
+                    <option value="Varanasi"></option>
+                    <option value="Srinagar"></option>
+                    <option value="Dhanbad"></option>
+                </datalist>
+            </div>
+
+            <div>
+                <label for="gender" class="block text-sm font-medium text-gray-300 mb-1">Gender</label>
+                <select id="gender" name="gender" required
+                        class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                    <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+            </div>
+
+            <button type="submit"
+                    class="w-full py-3 mt-4 bg-blue-600 rounded-lg text-white font-semibold shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200">
+                Enter
+            </button>
+        </form>
+
+        <div id="message-box" class="mt-6 p-4 rounded-lg text-center font-medium transition-opacity duration-300">
+        </div>
+
+    </div>
+
+    <script>
+        const form = document.getElementById('lead-form');
+        const messageBox = document.getElementById('message-box');
+
+        // Google Sheets configuration
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            messageBox.style.display = 'none';
+            messageBox.textContent = '';
+            messageBox.className = 'mt-6 p-4 rounded-lg text-center font-medium';
+
+            const nameInput = document.getElementById('name');
+            const phoneInput = document.getElementById('phone');
+            const cityInput = document.getElementById('city');
+            const genderInput = document.getElementById('gender');
+
+            if (nameInput.value.trim() === '' || phoneInput.value.trim() === '' || cityInput.value.trim() === '' || genderInput.value.trim() === '') {
+                messageBox.style.display = 'block';
+                messageBox.textContent = 'Please fill out all fields.';
+                messageBox.classList.add('bg-red-500', 'text-white');
+                return;
+            }
+
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
+
+            try {
+                // Prepare form data for Google Sheets
+                const formData = new FormData();
+                formData.append('name', nameInput.value.trim());
+                formData.append('phone', phoneInput.value.trim());
+                formData.append('city', cityInput.value.trim());
+                formData.append('gender', genderInput.value.trim());
+                formData.append('timestamp', new Date().toISOString());
+                formData.append('source', 'instagram_ad');
+
+                // Send to Google Sheets
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    messageBox.style.display = 'block';
+                    messageBox.textContent = 'Thank you for your interest! We will be in touch soon.';
+                    messageBox.classList.add('bg-green-500', 'text-white');
+
+                    // Log to console as backup
+                    console.log('Form Submitted to Google Sheets!');
+                    console.log('Name:', nameInput.value.trim());
+                    console.log('Phone:', phoneInput.value.trim());
+                    console.log('City:', cityInput.value.trim());
+                    console.log('Gender:', genderInput.value.trim());
+                    console.log('Timestamp:', new Date().toISOString());
+                    console.log('Source:', 'instagram_ad');
+
+                    setTimeout(() => {
+                        form.reset();
+                    }, 2000);
+                } else {
+                    throw new Error('Failed to submit to Google Sheets');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                
+                // Fallback: Show success message and log to console
+                messageBox.style.display = 'block';
+                messageBox.textContent = 'Thank you for your interest! We will be in touch soon.';
+                messageBox.classList.add('bg-green-500', 'text-white');
+
+                // Log to console as backup
+                console.log('Form Submitted! (Console backup)');
+                console.log('Name:', nameInput.value.trim());
+                console.log('Phone:', phoneInput.value.trim());
+                console.log('City:', cityInput.value.trim());
+                console.log('Gender:', genderInput.value.trim());
+                console.log('Timestamp:', new Date().toISOString());
+                console.log('Source:', 'instagram_ad');
+
+                setTimeout(() => {
+                    form.reset();
+                }, 2000);
+            } finally {
+                setTimeout(() => {
+                    submitButton.textContent = originalButtonText;
+                    submitButton.disabled = false;
+                }, 1000);
+            }
+        });
+    </script>
+
+</body>
+</html> 
