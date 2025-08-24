@@ -127,7 +127,7 @@
         const messageBox = document.getElementById('message-box');
 
         // Add a 'submit' event listener to the form
-        form.addEventListener('submit', async function(event) {
+        form.addEventListener('submit', function(event) {
             // Prevent the default form submission (which would reload the page)
             event.preventDefault();
 
@@ -151,51 +151,34 @@
             submitButton.textContent = 'Submitting...';
             submitButton.disabled = true;
 
-            try {
-                // Prepare form data
-                const formData = {
-                    name: nameInput.value.trim(),
-                    phone: phoneInput.value.trim(),
-                    city: cityInput.value.trim(),
-                    gender: genderInput.value.trim(),
-                    timestamp: new Date().toISOString(),
-                    source: 'instagram_ad'
-                };
+            // For now, just show success message and log data
+            // In production, you would send this to your backend
+            console.log('Form Submitted!');
+            console.log('Name:', nameInput.value.trim());
+            console.log('Phone:', phoneInput.value.trim());
+            console.log('City:', cityInput.value.trim());
+            console.log('Gender:', genderInput.value.trim());
+            console.log('Timestamp:', new Date().toISOString());
+            console.log('Source:', 'instagram_ad');
 
-                // Send data to backend
-                const response = await fetch('/api/submit-lead', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                if (response.ok) {
-                    // Display success message
-                    messageBox.style.display = 'block';
-                    messageBox.textContent = 'Thank you for your interest! We will be in touch soon.';
-                    messageBox.classList.add('bg-green-500', 'text-white');
-
-                    // Reset the form fields after a short delay
-                    setTimeout(() => {
-                        form.reset();
-                    }, 2000);
-                } else {
-                    throw new Error('Failed to submit form');
-                }
-            } catch (error) {
-                console.error('Error submitting form:', error);
-                
-                // Display error message
+            // Simulate API call delay
+            setTimeout(() => {
+                // Display success message
                 messageBox.style.display = 'block';
-                messageBox.textContent = 'Something went wrong. Please try again later.';
-                messageBox.classList.add('bg-red-500', 'text-white');
-            } finally {
-                // Reset button state
+                messageBox.textContent = 'Thank you for your interest! We will be in touch soon.';
+                messageBox.classList.add('bg-green-500', 'text-white');
+
+                // Reset the form fields after a short delay
+                setTimeout(() => {
+                    form.reset();
+                }, 2000);
+            }, 1000);
+
+            // Reset button state
+            setTimeout(() => {
                 submitButton.textContent = originalButtonText;
                 submitButton.disabled = false;
-            }
+            }, 1000);
         });
     </script>
 
