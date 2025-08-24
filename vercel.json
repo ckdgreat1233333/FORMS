@@ -1,7 +1,13 @@
 {
   "version": 2,
   "functions": {
-    "api/index.js": {
+    "api/submit-lead.js": {
+      "maxDuration": 10
+    },
+    "api/leads.js": {
+      "maxDuration": 10
+    },
+    "api/stats.js": {
       "maxDuration": 10
     }
   }
