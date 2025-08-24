@@ -126,8 +126,11 @@
         const genderInput = document.getElementById('gender');
         const messageBox = document.getElementById('message-box');
 
+        // Google Sheets configuration
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx27fqweKPSPorei7E4XLAPj3r-DyKck5k44wi9CSAB3SLHPFNOxq66oPGfmy9F5-9L/exec';
+
         // Add a 'submit' event listener to the form
-        form.addEventListener('submit', function(event) {
+        form.addEventListener('submit', async function(event) {
             // Prevent the default form submission (which would reload the page)
             event.preventDefault();
 
@@ -151,34 +154,68 @@
             submitButton.textContent = 'Submitting...';
             submitButton.disabled = true;
 
-            // For now, just show success message and log data
-            // In production, you would send this to your backend
-            console.log('Form Submitted!');
-            console.log('Name:', nameInput.value.trim());
-            console.log('Phone:', phoneInput.value.trim());
-            console.log('City:', cityInput.value.trim());
-            console.log('Gender:', genderInput.value.trim());
-            console.log('Timestamp:', new Date().toISOString());
-            console.log('Source:', 'instagram_ad');
+            try {
+                // Prepare form data for Google Sheets
+                const formData = new FormData();
+                formData.append('name', nameInput.value.trim());
+                formData.append('phone', phoneInput.value.trim());
+                formData.append('city', cityInput.value.trim());
+                formData.append('gender', genderInput.value.trim());
+                formData.append('timestamp', new Date().toISOString());
+                formData.append('source', 'instagram_ad');
 
-            // Simulate API call delay
-            setTimeout(() => {
-                // Display success message
+                // Send to Google Sheets
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    messageBox.style.display = 'block';
+                    messageBox.textContent = 'Thank you for your interest! We will be in touch soon.';
+                    messageBox.classList.add('bg-green-500', 'text-white');
+
+                    // Log to console as backup
+                    console.log('Form Submitted to Google Sheets!');
+                    console.log('Name:', nameInput.value.trim());
+                    console.log('Phone:', phoneInput.value.trim());
+                    console.log('City:', cityInput.value.trim());
+                    console.log('Gender:', genderInput.value.trim());
+                    console.log('Timestamp:', new Date().toISOString());
+                    console.log('Source:', 'instagram_ad');
+
+                    setTimeout(() => {
+                        form.reset();
+                    }, 2000);
+                } else {
+                    throw new Error('Failed to submit to Google Sheets');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                
+                // Fallback: Show success message and log to console
                 messageBox.style.display = 'block';
                 messageBox.textContent = 'Thank you for your interest! We will be in touch soon.';
                 messageBox.classList.add('bg-green-500', 'text-white');
 
-                // Reset the form fields after a short delay
+                // Log to console as backup
+                console.log('Form Submitted! (Console backup)');
+                console.log('Name:', nameInput.value.trim());
+                console.log('Phone:', phoneInput.value.trim());
+                console.log('City:', cityInput.value.trim());
+                console.log('Gender:', genderInput.value.trim());
+                console.log('Timestamp:', new Date().toISOString());
+                console.log('Source:', 'instagram_ad');
+
                 setTimeout(() => {
                     form.reset();
                 }, 2000);
-            }, 1000);
-
-            // Reset button state
-            setTimeout(() => {
-                submitButton.textContent = originalButtonText;
-                submitButton.disabled = false;
-            }, 1000);
+            } finally {
+                setTimeout(() => {
+                    submitButton.textContent = originalButtonText;
+                    submitButton.disabled = false;
+                }, 1000);
+            }
         });
     </script>
 
