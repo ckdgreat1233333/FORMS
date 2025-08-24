@@ -1,0 +1,4 @@
+This is a test file to force Vercel to deploy the latest changes.
+Current timestamp: 2024-01-01
+Latest commit should be: 4aee5b9
+API structure: Simplified single handler in api/index.js 
