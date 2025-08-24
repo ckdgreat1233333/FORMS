@@ -164,52 +164,60 @@
                 formData.append('timestamp', new Date().toISOString());
                 formData.append('source', 'instagram_ad');
 
+                console.log('Submitting to Google Sheets:', {
+                    name: nameInput.value.trim(),
+                    phone: phoneInput.value.trim(),
+                    city: cityInput.value.trim(),
+                    gender: genderInput.value.trim(),
+                    source: 'instagram_ad'
+                });
+
                 // Send to Google Sheets
                 const response = await fetch(GOOGLE_SHEETS_URL, {
                     method: 'POST',
                     body: formData
                 });
 
-                if (response.ok) {
+                const responseText = await response.text();
+                console.log('Google Sheets response:', responseText);
+
+                let responseData;
+                try {
+                    responseData = JSON.parse(responseText);
+                } catch (e) {
+                    responseData = { result: 'unknown', message: responseText };
+                }
+
+                if (response.ok && responseData.result === 'success') {
                     messageBox.style.display = 'block';
                     messageBox.textContent = 'Thank you for your interest! We will be in touch soon.';
                     messageBox.classList.add('bg-green-500', 'text-white');
 
-                    // Log to console as backup
-                    console.log('Form Submitted to Google Sheets!');
-                    console.log('Name:', nameInput.value.trim());
-                    console.log('Phone:', phoneInput.value.trim());
-                    console.log('City:', cityInput.value.trim());
-                    console.log('Gender:', genderInput.value.trim());
-                    console.log('Timestamp:', new Date().toISOString());
-                    console.log('Source:', 'instagram_ad');
-
+                    console.log('✅ Successfully submitted to Google Sheets!');
+                    
                     setTimeout(() => {
                         form.reset();
                     }, 2000);
                 } else {
-                    throw new Error('Failed to submit to Google Sheets');
+                    throw new Error(responseData.error || responseData.message || 'Failed to submit to Google Sheets');
                 }
             } catch (error) {
                 console.error('Error submitting form:', error);
                 
-                // Fallback: Show success message and log to console
+                // Show error message to user
                 messageBox.style.display = 'block';
-                messageBox.textContent = 'Thank you for your interest! We will be in touch soon.';
-                messageBox.classList.add('bg-green-500', 'text-white');
+                messageBox.textContent = 'There was an issue submitting your information. Please try again or contact us directly.';
+                messageBox.classList.add('bg-red-500', 'text-white');
 
                 // Log to console as backup
-                console.log('Form Submitted! (Console backup)');
+                console.log('❌ Form submission failed, but logging data as backup:');
                 console.log('Name:', nameInput.value.trim());
                 console.log('Phone:', phoneInput.value.trim());
                 console.log('City:', cityInput.value.trim());
                 console.log('Gender:', genderInput.value.trim());
                 console.log('Timestamp:', new Date().toISOString());
                 console.log('Source:', 'instagram_ad');
-
-                setTimeout(() => {
-                    form.reset();
-                }, 2000);
+                console.log('Error:', error.message);
             } finally {
                 setTimeout(() => {
                     submitButton.textContent = originalButtonText;
