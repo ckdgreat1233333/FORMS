@@ -148,5 +148,8 @@ if (process.env.NODE_ENV !== 'production') {
     startServer().catch(console.error);
 }
 
+// Initialize data file for Vercel
+initializeDataFile().catch(console.error);
+
 // Export for Vercel
 module.exports = app; 
